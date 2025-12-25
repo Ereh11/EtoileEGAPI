@@ -1,0 +1,6 @@
+@EtoileEGAPI_HostAddress = http://localhost:5018
+
+GET {{EtoileEGAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
