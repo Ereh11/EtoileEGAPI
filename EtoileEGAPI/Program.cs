@@ -9,8 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
+
+#region Infrastructure DI Registration
 builder.Services.AddInfraStructureDIRegister(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Host.UseSerilogLogging(builder.Configuration);
+#endregion
+#region Application DI Registration
+//builder.Services.AddApplicationDIRegister();
+#endregion
 
 var app = builder.Build();
 
