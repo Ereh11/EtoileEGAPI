@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Infrastructure.Security.Infrastructure.Security;
 
 namespace Infrastructure.InfraStructureDI;
 

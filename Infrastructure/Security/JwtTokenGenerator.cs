@@ -54,7 +54,7 @@ namespace Infrastructure.Security
             rng.GetBytes(randomBytes);
             return Convert.ToBase64String(randomBytes);
         }
-        public DateTime GetAccessTokenExpiry()
+        public DateTime? GetAccessTokenExpiry()
         {
             return DateTime.UtcNow.AddMinutes(
                 _jwtSettings.TokenExpirationInMinutes);
