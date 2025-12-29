@@ -12,7 +12,6 @@ builder.Services.AddOpenApi();
 
 #region Infrastructure DI Registration
 builder.Services.AddInfraStructureDIRegister(builder.Configuration);
-builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Host.UseSerilogLogging(builder.Configuration);
 #endregion
 #region Application DI Registration
