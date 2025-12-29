@@ -23,40 +23,48 @@ public static class InfraStructureDIRegister
         services.AddTransient<UnitOfWork>();
         #region Repositories Registration
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddJwtAuthentication(configuration);
         #endregion
     }
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJwtAuthentication(
+            this IServiceCollection services,
+            IConfiguration configuration)
     {
-        var jwtSettingsSection = configuration.GetSection("JwtSettings");
-        services.Configure<JwtSettings>(jwtSettingsSection);
+        services
+            .AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection("JwtSettings"))
+            .Validate(s =>
+                !string.IsNullOrWhiteSpace(s.Secret) &&
+                s.Secret.Length >= 32,
+                "JWT Secret must be at least 32 characters")
+            .ValidateOnStart();
 
-        var jwtSettings = jwtSettingsSection.Get<JwtSettings>() ??
-            throw new InvalidOperationException("JWT settings are not configured");
+        var jwtSettings = configuration
+            .GetSection("JwtSettings")
+            .Get<JwtSettings>()!;
 
-        var secretKey = Encoding.UTF8.GetBytes(jwtSettings.Secret);
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                //ValidIssuer = jwtSettings.Issuer,
-                //ValidAudience = jwtSettings.Audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-        });
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
         services.AddAuthorization();
 
         return services;
+
     }
 }

@@ -7,4 +7,6 @@ public interface IJwtTokenGenerator
 {
     string GenerateAccessToken(ApplicationUser user, IList<string> roles);
     ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+    string GenerateRefreshToken();
+    DateTime? GetAccessTokenExpiry();
 }

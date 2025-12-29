@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using Domain.Interfaces.RepositoryBase;
 using Domain.Interfaces.UnitOfWork;
 using Infrastructure.Persistence.Repositories.RepositoryBase;
