@@ -4,13 +4,14 @@ using Domain.Interfaces.JwtTokenGenerator;
 using Infrastructure.Persistence.Context;
 using Infrastructure.Persistence.UnitOfWork;
 using Infrastructure.Security;
+using Infrastructure.Security.Infrastructure.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Infrastructure.Security.Infrastructure.Security;
+using System.Text;
 
 namespace Infrastructure.InfraStructureDI;
 
@@ -22,6 +23,16 @@ public static class InfraStructureDIRegister
 
         services.AddDbContext<EtolieEGDbContext>(options => options.UseSqlServer(Config.Read_DefaultConnection));
         services.AddTransient<UnitOfWork>();
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        {
+            options.Password.RequiredLength = 8;
+            options.Password.RequireDigit = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = false;
+        })
+        .AddEntityFrameworkStores<EtolieEGDbContext>()
+        .AddDefaultTokenProviders();
         #region Repositories Registration
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddJwtAuthentication(configuration);
